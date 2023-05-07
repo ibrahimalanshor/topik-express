@@ -1,7 +1,6 @@
 import { before, describe, it } from 'mocha';
 import { expect } from '../../../src/common/test/chai';
 import { createObjectTransformerWithValidator } from '../../../src/common/dto/transform-and-validate-object';
-import { ValidationSchemaError } from '../../../src/common/errors/validation-schema-error';
 import { CreateTopicDto } from '../../../src/modules/topic/dto/create-topic.dto';
 import supertest from 'supertest';
 import { server } from '../../../server';
@@ -22,9 +21,7 @@ describe('create topic test', () => {
       const transformPayload =
         createObjectTransformerWithValidator(CreateTopicDto);
 
-      expect(transformPayload(invalidPayload)).to.be.rejectedWith(
-        ValidationSchemaError
-      );
+      await expect(transformPayload(invalidPayload)).to.eventually.be.rejected;
     });
 
     it('it should return 422 when body request is invalid', async () => {
