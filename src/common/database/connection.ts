@@ -1,14 +1,9 @@
 import knex, { Knex } from 'knex';
+import { databaseConfig } from '../../config/database.config';
 
 export function createConnection(): Knex {
   return knex({
     client: 'mysql2',
-    connection: {
-      host: 'localhost',
-      port: 3306,
-      user: 'ibrahimalanshor',
-      password: '1br4h1mk3c3',
-      database: 'topik',
-    },
+    connection: databaseConfig,
   });
 }
