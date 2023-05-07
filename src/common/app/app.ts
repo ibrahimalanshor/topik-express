@@ -1,11 +1,15 @@
 import http from 'http';
 import express from 'express';
 import { createErrorMiddleware } from './error';
+import morgan from 'morgan';
+import helmet from 'helmet';
+import cors from 'cors';
 
 interface AppConfig {
   plugins: express.RequestHandler[];
   routes: express.Router[];
   errorLog: boolean;
+  log: boolean;
   port: number;
 }
 
@@ -16,6 +20,7 @@ class App {
     plugins: [],
     routes: [],
     errorLog: true,
+    log: true,
     port: 4000,
   };
 
@@ -27,6 +32,7 @@ class App {
       this.config.plugins = config.plugins || [];
       this.config.routes = config.routes || [];
       this.config.errorLog = config.errorLog ?? true;
+      this.config.log = config.log ?? true;
       this.config.port = config.port || 4000;
     }
 
@@ -65,6 +71,13 @@ export function createApp(config: Partial<AppConfig>): App {
 
   server.use(express.urlencoded({ extended: true }));
   server.use(express.json());
+
+  if (config.log) {
+    server.use(morgan('tiny'));
+  }
+
+  server.use(helmet());
+  server.use(cors());
 
   return new App(server, config);
 }
