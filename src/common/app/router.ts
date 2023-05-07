@@ -1,4 +1,5 @@
 import express from 'express';
+import Container from 'typedi';
 
 type RequestHandler = express.RequestHandler | express.RequestHandler[];
 
@@ -6,8 +7,8 @@ class Router<T> {
   private router: express.Router = express.Router();
   private controller: T;
 
-  constructor(controller: new () => T) {
-    this.controller = new controller();
+  constructor(controller: T) {
+    this.controller = controller;
   }
 
   getRouter(): express.Router {
@@ -39,7 +40,7 @@ class Router<T> {
   }
 }
 
-export function createRoute<T>(constructor: new () => T) {
+export function createRoute<T>(constructor: T) {
   const router = new Router<T>(constructor);
 
   return router;

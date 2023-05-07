@@ -9,7 +9,9 @@ async function transformAndValidate<T extends object>(
   obj: Record<string, any>
 ): Promise<T> {
   try {
-    const transformedObj = plainToClass(classConstructor, obj);
+    const transformedObj = plainToClass(classConstructor, obj, {
+      excludeExtraneousValues: true,
+    });
 
     await validateOrReject(transformedObj);
 
