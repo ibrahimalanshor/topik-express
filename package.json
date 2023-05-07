@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "dev": "nodemon index.ts",
-    "build": "tsc --build",
-    "start": "node dist/index.js",
+    "dev": "nodemon bin/serve.ts",
+    "build": "rimraf dist && tsc --build && copyfiles .env.* dist",
+    "start": "node dist/bin/serve.js",
     "prepare": "husky install"
   },
   "repository": {
@@ -33,6 +33,7 @@
     "chai-as-promised": "^7.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
+    "copyfiles": "^2.4.1",
     "dotenv": "^16.0.3",
     "eslint": "^8.39.0",
     "husky": "^8.0.3",
@@ -40,6 +41,7 @@
     "mocha": "^10.2.0",
     "nodemon": "^2.0.22",
     "prettier": "2.8.8",
+    "rimraf": "^5.0.0",
     "supertest": "^6.3.3",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4"
