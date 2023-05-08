@@ -13,4 +13,9 @@ export class TopicController {
       name: context.req.body.name || 'Untitled',
     });
   }
+
+  @autobind
+  async getTopics(context: RouterContext) {
+    return context.req.query;
+  }
 }
