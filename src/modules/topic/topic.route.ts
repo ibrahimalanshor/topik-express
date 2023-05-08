@@ -1,4 +1,5 @@
 import Container from 'typedi';
+import { createRemoveUndefinedValuesMiddleware } from '../../common/app/middlewares/remove-undefined-values.middleware';
 import {
   createBodyValidator,
   createQueryValidator,
@@ -20,6 +21,7 @@ export const topicRoute = createRoute<TopicController>(
   ])
   .get('/api/topics', (controller: TopicController) => [
     createQueryValidator(GetTopicDto),
+    createRemoveUndefinedValuesMiddleware(),
     createJsonResponse(controller.getTopics),
   ])
   .getRouter();

@@ -56,6 +56,7 @@ describe('get topic test', () => {
     generateFilterTest(topicService.findAll.bind(topicService), {
       data: topics,
       id: 'name',
+      endpoint: '/api/topics',
     });
 
     it('should get all searched topics', async () => {
@@ -66,6 +67,19 @@ describe('get topic test', () => {
 
       expect(res).to.be.an('array').and.have.length(1);
       expect(res[0].name).to.equal(search);
+    });
+
+    it('should return 200 searched topics', async () => {
+      const search = topics[2].name;
+      const res = await supertest(server.httpServer)
+        .get('/api/topics')
+        .query({
+          name: search,
+        })
+        .expect(200);
+
+      expect(res.body.data).to.be.an('array').and.have.length(1);
+      expect(res.body.data[0].name).to.equal(search);
     });
   });
 });

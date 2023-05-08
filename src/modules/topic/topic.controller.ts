@@ -16,6 +16,6 @@ export class TopicController {
 
   @autobind
   async getTopics(context: RouterContext) {
-    return context.req.query;
+    return await this.topicService.findAll(context.req.query);
   }
 }
