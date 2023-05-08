@@ -3,8 +3,14 @@ import { Model, Row } from '../model/model';
 export abstract class BaseRepository<T> {
   abstract model: Model<T>;
 
-  async create(values: Record<string, any>): Promise<Row<T>> {
+  async create(
+    values: Record<string, any> | Record<string, any>[]
+  ): Promise<Row<T>> {
     return (await this.model.create(values, { returnCreated: true })) as Row<T>;
+  }
+
+  async findALl(query?: Record<string, any>): Promise<Row<T>[]> {
+    return await this.model.findAll(query);
   }
 
   async findOne(where: Record<string, any>): Promise<Row<T>> {
