@@ -82,8 +82,8 @@ export abstract class Model<T> extends BaseModel {
     const res: Row<T>[] = await this.getQueryBuilder()
       .select(this.columns)
       .where(this.getWhereBuilder(query))
-      .limit(query?.limit ?? 10)
-      .offset(query?.offset ?? 0)
+      .limit(query?.limit ? +query.limit : 10)
+      .offset(query?.offset ? +query.offset : 0)
       .orderBy(rawSortToOrderBy(query?.sort));
 
     return res.map((item) => mapKeysToValues(this.columns, item)) as Row<T>[];
