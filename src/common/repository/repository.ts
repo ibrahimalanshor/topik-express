@@ -1,4 +1,4 @@
-import { Model, Row } from '../model/model';
+import { FindOneOptions, Model, Row } from '../model/model';
 
 export abstract class BaseRepository<T> {
   abstract model: Model<T>;
@@ -13,8 +13,11 @@ export abstract class BaseRepository<T> {
     return await this.model.findAll(query);
   }
 
-  async findOne(where: Record<string, any>): Promise<Row<T>> {
-    return await this.model.findOne(where);
+  async findOne(
+    where: Record<string, any>,
+    options?: FindOneOptions
+  ): Promise<Row<T>> {
+    return await this.model.findOne(where, options);
   }
 
   async delete(where?: Record<string, any>): Promise<void> {
