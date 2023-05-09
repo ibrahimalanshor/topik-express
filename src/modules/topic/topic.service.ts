@@ -1,7 +1,7 @@
 import { Service } from 'typedi';
 import { FindOneOptions, RowId, UpdateOptions } from '../../common/model/model';
 import { CreateTopicDto } from './dto/create-topic.dto';
-import { FindTopicDto } from './dto/find-topic.dto';
+import { FindTopicParamsDto } from './dto/find-topic.dto';
 import { GetTopicDto } from './dto/get-topic.dto';
 import {
   UpdateTopicParamsDto,
@@ -25,7 +25,7 @@ export class TopicService {
   }
 
   async findOne(
-    query: FindTopicDto,
+    query: FindTopicParamsDto,
     options?: FindOneOptions
   ): Promise<StoredTopic> {
     return await this.topicRepository.findOne(query, {

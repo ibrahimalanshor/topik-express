@@ -9,7 +9,7 @@ import { createTrimBodyMiddleware } from '../../common/app/middlewares/trim-body
 import { createJsonResponse } from '../../common/app/response';
 import { createRoute } from '../../common/app/router';
 import { CreateTopicDto } from './dto/create-topic.dto';
-import { FindTopicDto } from './dto/find-topic.dto';
+import { FindTopicParamsDto } from './dto/find-topic.dto';
 import { GetTopicDto } from './dto/get-topic.dto';
 import { TopicController } from './topic.controller';
 import { toNumber } from '../../common/helpers/convert-type.helper';
@@ -32,7 +32,7 @@ export const topicRoute = createRoute<TopicController>(
     createJsonResponse(controller.getTopics),
   ])
   .get('/api/topics/:id', (controller: TopicController) => [
-    createParamsValidator(FindTopicDto, {
+    createParamsValidator(FindTopicParamsDto, {
       pre: (param) => ({
         id: toNumber(param.id),
       }),

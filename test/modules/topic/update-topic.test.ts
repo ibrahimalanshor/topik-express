@@ -10,9 +10,11 @@ import { server } from '../../../server';
 import Container from 'typedi';
 import { TopicService } from '../../../src/modules/topic/topic.service';
 import { StoredTopic } from '../../../src/modules/topic/topic.entity';
+import { TopicRepository } from '../../../src/modules/topic/topic.repository';
 
-describe.only('update topic test', () => {
+describe('update topic test', () => {
   const topicService = Container.get(TopicService);
+  const topicRepo = Container.get(TopicRepository);
 
   describe('validation test', () => {
     it('should return validation error when object is invalid', async () => {
@@ -79,6 +81,8 @@ describe.only('update topic test', () => {
     };
 
     before(async () => {
+      topicRepo.delete();
+
       test.topic = await topicService.create({
         name: 'Test',
       });
