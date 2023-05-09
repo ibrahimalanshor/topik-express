@@ -13,6 +13,10 @@ import { FindTopicDto } from './dto/find-topic.dto';
 import { GetTopicDto } from './dto/get-topic.dto';
 import { TopicController } from './topic.controller';
 import { toNumber } from '../../common/helpers/convert-type.helper';
+import {
+  UpdateTopicParamsDto,
+  UpdateTopicValuesDto,
+} from './dto/update-topic.dto';
 
 export const topicRoute = createRoute<TopicController>(
   Container.get(TopicController)
@@ -34,5 +38,15 @@ export const topicRoute = createRoute<TopicController>(
       }),
     }),
     createJsonResponse(controller.findTopic),
+  ])
+  .patch('/api/topics/:id', (controller: TopicController) => [
+    createParamsValidator(UpdateTopicParamsDto, {
+      pre: (param) => ({
+        id: toNumber(param.id),
+      }),
+    }),
+    createTrimBodyMiddleware(),
+    createBodyValidator(UpdateTopicValuesDto),
+    createJsonResponse(controller.updateTopic),
   ])
   .getRouter();

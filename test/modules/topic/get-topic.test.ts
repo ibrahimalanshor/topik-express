@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+import { expect } from '../../../src/common/test/chai';
 import { before, describe, it } from 'mocha';
 import supertest from 'supertest';
 import { createObjectTransformerWithValidator } from '../../../src/common/dto/transform-and-validate-object';

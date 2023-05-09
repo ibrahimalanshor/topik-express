@@ -1,4 +1,10 @@
-import { FindOneOptions, Model, Row } from '../model/model';
+import {
+  AffectedRow,
+  FindOneOptions,
+  Model,
+  Row,
+  UpdateOptions,
+} from '../model/model';
 
 export abstract class BaseRepository<T> {
   abstract model: Model<T>;
@@ -18,6 +24,17 @@ export abstract class BaseRepository<T> {
     options?: FindOneOptions
   ): Promise<Row<T>> {
     return await this.model.findOne(where, options);
+  }
+
+  async update(
+    where: Record<string, any>,
+    values: Record<string, any>,
+    options?: UpdateOptions
+  ): Promise<Row<T>> {
+    return (await this.model.update(where, values, {
+      throwOnNoAffectedRows: options?.throwOnNoAffectedRows ?? true,
+      returnUpdated: true,
+    })) as Row<T>;
   }
 
   async delete(where?: Record<string, any>): Promise<void> {
