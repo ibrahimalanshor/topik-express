@@ -1,5 +1,6 @@
 import { Knex } from 'knex';
 import { connection } from '../../database/connection';
+import { EmptyResultError } from '../errors/empty-result-error';
 import {
   WhereOperator,
   mapKeysToValues,
@@ -14,10 +15,13 @@ export type FilterableColumn = {
   operator: WhereOperator;
 };
 
-type ModelCreateOptions = {
+export type ModelCreateOptions = {
   returnCreated: boolean;
 };
-type FindAllQuery = {
+export type FindOneOptions = {
+  throwOnEmpty: boolean;
+};
+export type FindAllQuery = {
   [key: string]: any;
   limit?: number;
   offset?: number;
@@ -67,12 +71,11 @@ export abstract class Model<T> extends BaseModel {
     values: Record<string, any> | Record<string, any>[],
     options?: ModelCreateOptions
   ): Promise<RowId | Row<T>> {
-    const data =
-      typeof values === 'string'
-        ? mapKeysToValues(this.getColumns(), values)
-        : values.map((value: Record<string, any>) =>
-            mapKeysToValues(this.getColumns(), value)
-          );
+    const data = !Array.isArray(values)
+      ? mapKeysToValues(this.getColumns(), values)
+      : values.map((value: Record<string, any>) =>
+          mapKeysToValues(this.getColumns(), value)
+        );
     const [id] = await this.getQueryBuilder().insert(data);
 
     return options?.returnCreated ? this.findOne({ id }) : id;
@@ -80,20 +83,29 @@ export abstract class Model<T> extends BaseModel {
 
   async findAll(query?: FindAllQuery): Promise<Row<T>[]> {
     const res: Row<T>[] = await this.getQueryBuilder()
-      .select(this.columns)
+      .select(this.getColumns())
       .where(this.getWhereBuilder(query))
       .limit(query?.limit ? +query.limit : 10)
       .offset(query?.offset ? +query.offset : 0)
       .orderBy(rawSortToOrderBy(query?.sort));
 
-    return res.map((item) => mapKeysToValues(this.columns, item)) as Row<T>[];
+    return res.map((item) =>
+      mapKeysToValues(this.getColumns(), item)
+    ) as Row<T>[];
   }
 
-  async findOne(where: Record<string, any>): Promise<Row<T>> {
+  async findOne(
+    where: Record<string, any>,
+    options?: FindOneOptions
+  ): Promise<Row<T>> {
     const found = await this.getQueryBuilder()
-      .select(this.columns)
+      .select(this.getColumns())
       .where(this.getWhereBuilder(where))
       .first();
+
+    if (!found && options?.throwOnEmpty) {
+      throw new EmptyResultError();
+    }
 
     return mapKeysToValues(this.getColumns(), found) as Row<T>;
   }

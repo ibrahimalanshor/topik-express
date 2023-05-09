@@ -1,6 +1,8 @@
 import autobind from 'autobind-decorator';
 import { Inject, Service } from 'typedi';
+import { NotFoundError } from '../../common/app/http-error/not-found.error';
 import { RouterContext } from '../../common/app/response';
+import { EmptyResultError } from '../../common/errors/empty-result-error';
 import { TopicService } from './topic.service';
 
 @Service()
@@ -17,5 +19,21 @@ export class TopicController {
   @autobind
   async getTopics(context: RouterContext) {
     return await this.topicService.findAll(context.req.query);
+  }
+
+  @autobind
+  async findTopic(context: RouterContext) {
+    try {
+      return await this.topicService.findOne(
+        { id: +context.req.params.id },
+        { throwOnEmpty: true }
+      );
+    } catch (err) {
+      if (err instanceof EmptyResultError) {
+        throw new NotFoundError();
+      }
+
+      throw err;
+    }
   }
 }
