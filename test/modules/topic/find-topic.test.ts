@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+import { expect } from '../../../src/common/test/chai';
 import { before, describe, it } from 'mocha';
 import supertest from 'supertest';
 import Container from 'typedi';
@@ -7,7 +7,7 @@ import { StoredTopic } from '../../../src/modules/topic/topic.entity';
 import { TopicRepository } from '../../../src/modules/topic/topic.repository';
 import { TopicService } from '../../../src/modules/topic/topic.service';
 
-describe('find topic test', () => {
+describe.only('find topic test', () => {
   const topicService = Container.get(TopicService);
   const topicRepo = Container.get(TopicRepository);
 

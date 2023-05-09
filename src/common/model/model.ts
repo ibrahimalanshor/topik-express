@@ -10,6 +10,7 @@ import {
 
 export type RowId = number;
 export type Row<T> = T & { id: RowId };
+export type AffectedRow = number;
 export type FilterableColumn = {
   column: string;
   operator: WhereOperator;
@@ -20,6 +21,10 @@ export type ModelCreateOptions = {
 };
 export type FindOneOptions = {
   throwOnEmpty: boolean;
+};
+export type UpdateOptions = {
+  throwOnNoAffectedRows: boolean;
+  returnUpdated: boolean;
 };
 export type FindAllQuery = {
   [key: string]: any;
@@ -78,7 +83,7 @@ export abstract class Model<T> extends BaseModel {
         );
     const [id] = await this.getQueryBuilder().insert(data);
 
-    return options?.returnCreated ? this.findOne({ id }) : id;
+    return options?.returnCreated ? await this.findOne({ id }) : id;
   }
 
   async findAll(query?: FindAllQuery): Promise<Row<T>[]> {
@@ -108,6 +113,22 @@ export abstract class Model<T> extends BaseModel {
     }
 
     return mapKeysToValues(this.getColumns(), found) as Row<T>;
+  }
+
+  async update(
+    where: Record<string, any>,
+    values: Record<string, any>,
+    options?: UpdateOptions
+  ): Promise<AffectedRow | Row<T>> {
+    const affected = await this.getQueryBuilder()
+      .where(this.getWhereBuilder(where))
+      .update(values);
+
+    if (affected < 1 && options?.throwOnNoAffectedRows) {
+      throw new EmptyResultError();
+    }
+
+    return options?.returnUpdated ? await this.findOne(where) : affected;
   }
 
   async delete(where?: Record<string, any>): Promise<void> {

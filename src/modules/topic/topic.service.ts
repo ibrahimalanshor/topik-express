@@ -1,8 +1,12 @@
 import { Service } from 'typedi';
-import { FindOneOptions, RowId } from '../../common/model/model';
+import { FindOneOptions, RowId, UpdateOptions } from '../../common/model/model';
 import { CreateTopicDto } from './dto/create-topic.dto';
-import { FindTopicDto } from './dto/find-topic.dto';
+import { FindTopicParamsDto } from './dto/find-topic.dto';
 import { GetTopicDto } from './dto/get-topic.dto';
+import {
+  UpdateTopicParamsDto,
+  UpdateTopicValuesDto,
+} from './dto/update-topic.dto';
 import { StoredTopic } from './topic.entity';
 import { TopicRepository } from './topic.repository';
 
@@ -21,11 +25,22 @@ export class TopicService {
   }
 
   async findOne(
-    query: FindTopicDto,
+    query: FindTopicParamsDto,
     options?: FindOneOptions
   ): Promise<StoredTopic> {
     return await this.topicRepository.findOne(query, {
       throwOnEmpty: options?.throwOnEmpty ?? true,
+    });
+  }
+
+  async update(
+    query: UpdateTopicParamsDto,
+    values: UpdateTopicValuesDto,
+    options?: UpdateOptions
+  ) {
+    return await this.topicRepository.update(query, values, {
+      throwOnNoAffectedRows: options?.throwOnNoAffectedRows ?? true,
+      returnUpdated: true,
     });
   }
 }
