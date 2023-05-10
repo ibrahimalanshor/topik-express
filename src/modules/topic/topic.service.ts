@@ -1,5 +1,9 @@
 import { Service } from 'typedi';
-import { FindOneOptions, RowId, UpdateOptions } from '../../common/model/model';
+import {
+  DeleteOptions,
+  FindOneOptions,
+  UpdateOptions,
+} from '../../common/model/model';
 import { CreateTopicDto } from './dto/create-topic.dto';
 import { FindTopicParamsDto } from './dto/find-topic.dto';
 import { GetTopicDto } from './dto/get-topic.dto';
@@ -9,6 +13,7 @@ import {
 } from './dto/update-topic.dto';
 import { StoredTopic } from './topic.entity';
 import { TopicRepository } from './topic.repository';
+import { DeleteTopicParamsDto } from './dto/delete-topic.dto';
 
 @Service()
 export class TopicService {
@@ -37,10 +42,19 @@ export class TopicService {
     query: UpdateTopicParamsDto,
     values: UpdateTopicValuesDto,
     options?: UpdateOptions
-  ) {
+  ): Promise<StoredTopic> {
     return await this.topicRepository.update(query, values, {
       throwOnNoAffectedRows: options?.throwOnNoAffectedRows ?? true,
       returnUpdated: true,
+    });
+  }
+
+  async delete(
+    query: DeleteTopicParamsDto,
+    options?: DeleteOptions
+  ): Promise<void> {
+    await this.topicRepository.delete(query, {
+      throwOnNoAffectedRows: options?.throwOnNoAffectedRows ?? true,
     });
   }
 }

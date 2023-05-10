@@ -53,4 +53,19 @@ export class TopicController {
       throw err;
     }
   }
+
+  @autobind
+  async deleteTopic(context: RouterContext): Promise<void> {
+    try {
+      await this.topicService.delete({
+        id: +context.req.params.id,
+      });
+    } catch (err) {
+      if (err instanceof EmptyResultError) {
+        throw new NotFoundError();
+      }
+
+      throw err;
+    }
+  }
 }
