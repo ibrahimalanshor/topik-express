@@ -26,6 +26,9 @@ export type UpdateOptions = {
   throwOnNoAffectedRows: boolean;
   returnUpdated: boolean;
 };
+export type DeleteOptions = {
+  throwOnNoAffectedRows: boolean;
+};
 export type FindAllQuery = {
   [key: string]: any;
   limit?: number;
@@ -131,7 +134,16 @@ export abstract class Model<T> extends BaseModel {
     return options?.returnUpdated ? await this.findOne(where) : affected;
   }
 
-  async delete(where?: Record<string, any>): Promise<void> {
-    await this.getQueryBuilder().where(this.getWhereBuilder(where)).del();
+  async delete(
+    where?: Record<string, any>,
+    options?: DeleteOptions
+  ): Promise<void> {
+    const affected = await this.getQueryBuilder()
+      .where(this.getWhereBuilder(where))
+      .del();
+
+    if (affected < 1 && options?.throwOnNoAffectedRows) {
+      throw new EmptyResultError();
+    }
   }
 }

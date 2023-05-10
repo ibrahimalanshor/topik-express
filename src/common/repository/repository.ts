@@ -1,5 +1,6 @@
 import {
   AffectedRow,
+  DeleteOptions,
   FindOneOptions,
   Model,
   Row,
@@ -37,7 +38,10 @@ export abstract class BaseRepository<T> {
     })) as Row<T>;
   }
 
-  async delete(where?: Record<string, any>): Promise<void> {
-    await this.model.delete(where);
+  async delete(
+    where?: Record<string, any>,
+    options?: DeleteOptions
+  ): Promise<void> {
+    await this.model.delete(where, options);
   }
 }

@@ -17,6 +17,7 @@ import {
   UpdateTopicParamsDto,
   UpdateTopicValuesDto,
 } from './dto/update-topic.dto';
+import { DeleteTopicParamsDto } from './dto/delete-topic.dto';
 
 export const topicRoute = createRoute<TopicController>(
   Container.get(TopicController)
@@ -48,5 +49,13 @@ export const topicRoute = createRoute<TopicController>(
     createTrimBodyMiddleware(),
     createBodyValidator(UpdateTopicValuesDto),
     createJsonResponse(controller.updateTopic),
+  ])
+  .delete('/api/topics/:id', (controller: TopicController) => [
+    createParamsValidator(DeleteTopicParamsDto, {
+      pre: (param) => ({
+        id: toNumber(param.id),
+      }),
+    }),
+    createJsonResponse(controller.deleteTopic),
   ])
   .getRouter();
