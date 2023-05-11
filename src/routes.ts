@@ -1,3 +1,4 @@
+import { chatRoute } from './modules/chat/chat.route';
 import { topicRoute } from './modules/topic/topic.route';
 
-export const routes = [topicRoute];
+export const routes = [topicRoute, chatRoute];
