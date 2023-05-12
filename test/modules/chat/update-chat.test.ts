@@ -10,7 +10,7 @@ import { ChatRepository } from '../../../src/modules/chat/chat.repository';
 import { UpdateChatValuesDto } from '../../../src/modules/chat/dto/update-chat.dto';
 import { StoredChat } from '../../../src/modules/chat/chat.entity';
 
-describe.only('update chat test', () => {
+describe('update chat test', () => {
   const chatService = Container.get(ChatService);
   const chatRepo = Container.get(ChatRepository);
   const topicRepo = Container.get(TopicRepository);
