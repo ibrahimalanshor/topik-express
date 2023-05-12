@@ -10,7 +10,7 @@ import { ChatRepository } from '../../../src/modules/chat/chat.repository';
 import { DeleteChatParamsDto } from '../../../src/modules/chat/dto/delete-chat.dto';
 import { StoredChat } from '../../../src/modules/chat/chat.entity';
 
-describe.only('delete chat test', () => {
+describe('delete chat test', () => {
   const chatService = Container.get(ChatService);
   const chatRepo = Container.get(ChatRepository);
   const topicRepo = Container.get(TopicRepository);
