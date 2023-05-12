@@ -41,11 +41,15 @@ export function createBodyValidator<T extends Record<string, any>>(
 }
 
 export function createQueryValidator<T extends Record<string, any>>(
-  classConstructor: ClassConstructor<T>
+  classConstructor: ClassConstructor<T>,
+  options?: ValidatiorOption
 ): RequestHandler {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      req.query = await validateDto(classConstructor, req.query);
+      req.query = await validateDto(
+        classConstructor,
+        options?.pre ? options.pre(req.query) : req.query
+      );
 
       next();
     } catch (err) {
