@@ -28,7 +28,11 @@ export const chatRoute = createRoute<ChatController>(
     createJsonResponse(controller.createChat),
   ])
   .get('/api/chats', (controller: ChatController) => [
-    createQueryValidator(GetChatDto),
+    createQueryValidator(GetChatDto, {
+      pre: (query) => ({
+        topic_id: toNumber(query.topic_id),
+      }),
+    }),
     createRemoveUndefinedValuesMiddleware(),
     createJsonResponse(controller.getChats),
   ])

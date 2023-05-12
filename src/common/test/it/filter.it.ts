@@ -9,16 +9,23 @@ type Mock<T> = {
   data: T[];
   id: keyof T;
   endpoint: string;
+  total?: number;
+  query?: Record<string, any>;
+  expected?: {
+    offset: T | null;
+    sort: T;
+  };
 };
 
 export function generateFilterTest<T>(method: BaseFilterMethod, mock: Mock<T>) {
-  const { data, id } = mock;
+  const { data, id, query, expected, total } = mock;
   const col = id.toString();
 
   describe('base filter test', () => {
     it('should get all limited 2', async () => {
       const res = await method({
         limit: 1,
+        ...query,
       });
 
       expect(res).to.be.an('array').and.have.length(1);
@@ -29,20 +36,27 @@ export function generateFilterTest<T>(method: BaseFilterMethod, mock: Mock<T>) {
       const res = await method({
         limit: 1,
         offset: 1,
+        ...query,
       });
 
-      expect(res).to.be.an('array').and.have.length(1);
-      expect(res[0][id]).to.equal(data[1][id]);
+      if (expected?.offset) {
+        expect(res).to.be.an('array').and.have.length(1);
+        expect(res[0][id]).to.equal(expected?.offset[id] ?? data[1][id]);
+      }
     });
 
     it(`should get all sorted by ${col} desc`, async () => {
       const res = await method({
         sort: `-${col}`,
+        ...query,
       });
 
-      expect(res).to.be.an('array').and.have.length(data.length);
+      expect(res)
+        .to.be.an('array')
+        .and.have.length(total ?? data.length);
       expect(res[0][id]).to.equal(
-        data.slice(0).sort((a, b) => (a[id] > b[id] ? -1 : 1))[0][id]
+        expected?.sort[id] ??
+          data.slice(0).sort((a, b) => (a[id] > b[id] ? -1 : 1))[0][id]
       );
     });
 
@@ -53,6 +67,7 @@ export function generateFilterTest<T>(method: BaseFilterMethod, mock: Mock<T>) {
         .get(mock.endpoint)
         .query({
           limit: 1,
+          ...query,
         })
         .expect(200);
 
@@ -66,11 +81,16 @@ export function generateFilterTest<T>(method: BaseFilterMethod, mock: Mock<T>) {
         .query({
           limit: 1,
           offset: 1,
+          ...query,
         })
         .expect(200);
 
-      expect(res.body.data).to.be.an('array').and.have.length(1);
-      expect(res.body.data[0][id]).to.equal(data[1][id]);
+      if (expected?.offset) {
+        expect(res.body.data).to.be.an('array').and.have.length(1);
+        expect(res.body.data[0][id]).to.equal(
+          expected?.offset[id] ?? data[1][id]
+        );
+      }
     });
 
     it(`should return 200 sorted by ${col} desc`, async () => {
@@ -78,12 +98,16 @@ export function generateFilterTest<T>(method: BaseFilterMethod, mock: Mock<T>) {
         .get(mock.endpoint)
         .query({
           sort: `-${col}`,
+          ...query,
         })
         .expect(200);
 
-      expect(res.body.data).to.be.an('array').and.have.length(data.length);
+      expect(res.body.data)
+        .to.be.an('array')
+        .and.have.length(total ?? data.length);
       expect(res.body.data[0][id]).to.equal(
-        data.slice(0).sort((a, b) => (a[id] > b[id] ? -1 : 1))[0][id]
+        expected?.sort[id] ??
+          data.slice(0).sort((a, b) => (a[id] > b[id] ? -1 : 1))[0][id]
       );
     });
   });
