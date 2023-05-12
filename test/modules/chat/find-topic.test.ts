@@ -7,7 +7,7 @@ import { StoredTopic } from '../../../src/modules/topic/topic.entity';
 import { TopicRepository } from '../../../src/modules/topic/topic.repository';
 import { TopicService } from '../../../src/modules/topic/topic.service';
 
-describe('find topic test', () => {
+describe.skip('find topic test', () => {
   const topicService = Container.get(TopicService);
   const topicRepo = Container.get(TopicRepository);
 

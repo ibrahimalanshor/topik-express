@@ -81,7 +81,7 @@ describe('update topic test', () => {
     };
 
     before(async () => {
-      topicRepo.delete();
+      await topicRepo.delete();
 
       test.topic = await topicService.create({
         name: 'Test',
