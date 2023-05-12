@@ -1,48 +1,47 @@
 import { before, describe, it } from 'mocha';
 import { expect } from '../../../src/common/test/chai';
 import { createObjectTransformerWithValidator } from '../../../src/common/dto/transform-and-validate-object';
-import {
-  UpdateTopicParamsDto,
-  UpdateTopicValuesDto,
-} from '../../../src/modules/topic/dto/update-topic.dto';
 import supertest from 'supertest';
 import { server } from '../../../server';
 import Container from 'typedi';
-import { TopicService } from '../../../src/modules/topic/topic.service';
-import { StoredTopic } from '../../../src/modules/topic/topic.entity';
 import { TopicRepository } from '../../../src/modules/topic/topic.repository';
+import { ChatService } from '../../../src/modules/chat/chat.service';
+import { ChatRepository } from '../../../src/modules/chat/chat.repository';
+import { UpdateChatValuesDto } from '../../../src/modules/chat/dto/update-chat.dto';
+import { StoredChat } from '../../../src/modules/chat/chat.entity';
 
-describe.skip('update topic test', () => {
-  const topicService = Container.get(TopicService);
+describe.only('update chat test', () => {
+  const chatService = Container.get(ChatService);
+  const chatRepo = Container.get(ChatRepository);
   const topicRepo = Container.get(TopicRepository);
 
   describe('validation test', () => {
     it('should return validation error when object is invalid', async () => {
       const transformPayload =
-        createObjectTransformerWithValidator(UpdateTopicValuesDto);
+        createObjectTransformerWithValidator(UpdateChatValuesDto);
 
       await expect(
         transformPayload({
-          name: [],
+          content: [],
         })
       ).to.eventually.be.rejected;
     });
     it('should return 422 when body is invalid', async () => {
       const res = await supertest(server.httpServer)
-        .patch(`/api/topics/1`)
+        .patch(`/api/chats/1`)
         .send({
-          name: '    ',
+          content: '    ',
         })
         .expect(422);
 
-      expect(res.body).to.have.property('errors').and.have.property('name');
+      expect(res.body).to.have.property('errors').and.have.property('content');
     });
   });
 
   describe('invalid id test', () => {
     it('should return empty result error when id is invalid', async () => {
       const transformPayload =
-        createObjectTransformerWithValidator(UpdateTopicParamsDto);
+        createObjectTransformerWithValidator(UpdateChatValuesDto);
 
       await expect(
         transformPayload({
@@ -53,9 +52,9 @@ describe.skip('update topic test', () => {
 
     it('should 404 when params id is invalid', async () => {
       await supertest(server.httpServer)
-        .patch(`/api/topics/invalid`)
+        .patch(`/api/chats/invalid`)
         .send({
-          name: 'name',
+          content: 'content',
         })
         .expect(404);
     });
@@ -63,44 +62,48 @@ describe.skip('update topic test', () => {
 
   describe('not found test', () => {
     it('should return empty result error when id is not exists', async () => {
-      await expect(topicService.update({ id: 999 }, { name: 'test' })).to
+      await expect(chatService.update({ id: 999 }, { content: 'test' })).to
         .eventually.be.rejected;
     });
     it('should return 404 when id is not exists', async () => {
       await supertest(server.httpServer)
-        .patch('/api/topics/999')
-        .send({ name: 'test' })
+        .patch('/api/chats/999')
+        .send({ content: 'test' })
         .expect(404);
     });
   });
 
   describe('update test', () => {
-    const test: { topic?: StoredTopic } = {};
+    const test: { chat?: StoredChat } = {};
     const payload = {
-      name: 'Update',
+      content: 'Update',
     };
 
     before(async () => {
-      topicRepo.delete();
+      await topicRepo.delete();
+      await chatRepo.delete();
 
-      test.topic = await topicService.create({
-        name: 'Test',
+      const topic = await topicRepo.create({ name: 'test' });
+
+      test.chat = await chatService.create({
+        content: 'Test',
+        topic_id: topic.id,
       });
     });
 
     it('should success updated test', async () => {
-      const res = await topicService.update({ id: test.topic?.id }, payload);
+      const res = await chatService.update({ id: test.chat?.id }, payload);
 
-      expect(res.name).to.eql(payload?.name);
+      expect(res.content).to.eql(payload?.content);
     });
 
     it('should 200 updated test', async () => {
       const res = await supertest(server.httpServer)
-        .patch(`/api/topics/${test.topic?.id}`)
+        .patch(`/api/chats/${test.chat?.id}`)
         .send(payload)
         .expect(200);
 
-      expect(res.body.data.name).to.eql(payload?.name);
+      expect(res.body.data.content).to.eql(payload?.content);
     });
   });
 });
