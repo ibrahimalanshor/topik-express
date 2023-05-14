@@ -48,7 +48,7 @@ export function createQueryValidator<T extends Record<string, any>>(
     try {
       req.query = await validateDto(
         classConstructor,
-        options?.pre ? options.pre(req.query) : req.query
+        options?.pre ? { ...req.query, ...options.pre(req.query) } : req.query
       );
 
       next();
