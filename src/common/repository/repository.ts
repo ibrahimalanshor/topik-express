@@ -7,8 +7,12 @@ import {
 } from '../model/model';
 
 export type RowsData<T> = {
-  count: number;
   data: T[];
+  meta: {
+    limit: number;
+    offset: number;
+    count: number;
+  };
 };
 
 export abstract class BaseRepository<T> {
@@ -22,8 +26,12 @@ export abstract class BaseRepository<T> {
 
   async findALl(query?: Record<string, any>): Promise<RowsData<Row<T>>> {
     return {
-      count: await this.model.count(query),
       data: await this.model.findAll(query),
+      meta: {
+        count: await this.model.count(query),
+        limit: +(query?.limit ?? 10),
+        offset: +(query?.offset ?? 10),
+      },
     };
   }
 

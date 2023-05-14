@@ -87,20 +87,30 @@ describe('get chat test', () => {
 
     it('should get all chats', async () => {
       const res = await chatService.findAll();
+      const meta = {
+        count: test.chats.length,
+        limit: 10,
+        offset: 10,
+      };
 
-      expect(res.count).to.equal(test.chats.length);
+      expect(res.meta).to.be.eql(meta);
       expect(res.data).to.be.an('array').and.have.length(test.chats.length);
     });
 
     it('should get all chat by topic', async () => {
       const topicId = test.topics[1].id;
       const chat = test.chats[1];
+      const meta = {
+        limit: 10,
+        offset: 10,
+        count: 1,
+      };
 
       const res = await chatService.findAll({
         topic_id: topicId,
       });
 
-      expect(res.count).to.equal(1);
+      expect(res.meta).to.eql(meta);
       expect(res.data).to.be.an('array').and.have.length(1);
       expect(res.data[0].content).to.equal(chat.content);
     });
@@ -108,6 +118,11 @@ describe('get chat test', () => {
     it('should 200 chat by topic', async () => {
       const topicId = test.topics[1].id;
       const chat = test.chats[1];
+      const meta = {
+        limit: 10,
+        offset: 10,
+        count: 1,
+      };
 
       const res = await supertest(server.httpServer)
         .get('/api/chats')
@@ -116,7 +131,7 @@ describe('get chat test', () => {
         })
         .expect(200);
 
-      expect(res.body.data.count).to.equal(1);
+      expect(res.body.data.meta).to.eql(meta);
       expect(res.body.data.data).to.be.an('array').and.have.length(1);
       expect(res.body.data.data[0].content).to.equal(chat.content);
     });
