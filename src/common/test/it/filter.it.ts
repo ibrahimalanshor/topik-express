@@ -28,8 +28,9 @@ export function generateFilterTest<T>(method: BaseFilterMethod, mock: Mock<T>) {
         ...query,
       });
 
-      expect(res).to.be.an('array').and.have.length(1);
-      expect(res[0][id]).to.equal(data[0][id]);
+      expect(res.count).to.equal(total ?? mock.data.length);
+      expect(res.data).to.be.an('array').and.have.length(1);
+      expect(res.data[0][id]).to.equal(data[0][id]);
     });
 
     it('should get all limited 2 and offseted 1', async () => {
@@ -40,8 +41,9 @@ export function generateFilterTest<T>(method: BaseFilterMethod, mock: Mock<T>) {
       });
 
       if (expected?.offset) {
-        expect(res).to.be.an('array').and.have.length(1);
-        expect(res[0][id]).to.equal(expected?.offset[id] ?? data[1][id]);
+        expect(res.count).to.equal(total ?? mock.data.length);
+        expect(res.data).to.be.an('array').and.have.length(1);
+        expect(res.data[0][id]).to.equal(expected?.offset[id] ?? data[1][id]);
       }
     });
 
@@ -51,10 +53,11 @@ export function generateFilterTest<T>(method: BaseFilterMethod, mock: Mock<T>) {
         ...query,
       });
 
-      expect(res)
+      expect(res.count).to.equal(total ?? mock.data.length);
+      expect(res.data)
         .to.be.an('array')
         .and.have.length(total ?? data.length);
-      expect(res[0][id]).to.equal(
+      expect(res.data[0][id]).to.equal(
         expected?.sort[id] ??
           data.slice(0).sort((a, b) => (a[id] > b[id] ? -1 : 1))[0][id]
       );
@@ -71,8 +74,9 @@ export function generateFilterTest<T>(method: BaseFilterMethod, mock: Mock<T>) {
         })
         .expect(200);
 
-      expect(res.body.data).to.be.an('array').and.have.length(1);
-      expect(res.body.data[0][id]).to.equal(data[0][id]);
+      expect(res.body.data.count).to.equal(total ?? mock.data.length);
+      expect(res.body.data.data).to.be.an('array').and.have.length(1);
+      expect(res.body.data.data[0][id]).to.equal(data[0][id]);
     });
 
     it('should return 200 limited 2 and offseted 1', async () => {
@@ -86,8 +90,9 @@ export function generateFilterTest<T>(method: BaseFilterMethod, mock: Mock<T>) {
         .expect(200);
 
       if (expected?.offset) {
-        expect(res.body.data).to.be.an('array').and.have.length(1);
-        expect(res.body.data[0][id]).to.equal(
+        expect(res.body.data.count).to.equal(total ?? mock.data.length);
+        expect(res.body.data.data).to.be.an('array').and.have.length(1);
+        expect(res.body.data.data[0][id]).to.equal(
           expected?.offset[id] ?? data[1][id]
         );
       }
@@ -102,10 +107,11 @@ export function generateFilterTest<T>(method: BaseFilterMethod, mock: Mock<T>) {
         })
         .expect(200);
 
-      expect(res.body.data)
+      expect(res.body.data.count).to.equal(total ?? mock.data.length);
+      expect(res.body.data.data)
         .to.be.an('array')
         .and.have.length(total ?? data.length);
-      expect(res.body.data[0][id]).to.equal(
+      expect(res.body.data.data[0][id]).to.equal(
         expected?.sort[id] ??
           data.slice(0).sort((a, b) => (a[id] > b[id] ? -1 : 1))[0][id]
       );

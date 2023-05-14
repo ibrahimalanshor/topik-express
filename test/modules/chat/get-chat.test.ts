@@ -85,10 +85,11 @@ describe('get chat test', () => {
       });
     });
 
-    it('should get all topics', async () => {
+    it('should get all chats', async () => {
       const res = await chatService.findAll();
 
-      expect(res).to.be.an('array').and.have.length(3);
+      expect(res.count).to.equal(test.chats.length);
+      expect(res.data).to.be.an('array').and.have.length(test.chats.length);
     });
 
     it('should get all chat by topic', async () => {
@@ -99,8 +100,9 @@ describe('get chat test', () => {
         topic_id: topicId,
       });
 
-      expect(res).to.be.an('array').and.have.length(1);
-      expect(res[0].content).to.equal(chat.content);
+      expect(res.count).to.equal(1);
+      expect(res.data).to.be.an('array').and.have.length(1);
+      expect(res.data[0].content).to.equal(chat.content);
     });
 
     it('should 200 chat by topic', async () => {
@@ -114,8 +116,9 @@ describe('get chat test', () => {
         })
         .expect(200);
 
-      expect(res.body.data).to.be.an('array').and.have.length(1);
-      expect(res.body.data[0].content).to.equal(chat.content);
+      expect(res.body.data.count).to.equal(1);
+      expect(res.body.data.data).to.be.an('array').and.have.length(1);
+      expect(res.body.data.data[0].content).to.equal(chat.content);
     });
   });
 });
