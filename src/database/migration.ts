@@ -14,8 +14,11 @@ export async function runMigration() {
     createChatMigration(),
   ];
 
-  for (const migration of migrations) {
+  for (const migration of migrations.reverse()) {
     await connection.schema.dropTableIfExists(migration.tableName);
+  }
+
+  for (const migration of migrations) {
     await connection.schema.createTable(migration.tableName, migration.columns);
   }
 }

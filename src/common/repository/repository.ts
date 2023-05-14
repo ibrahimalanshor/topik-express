@@ -1,11 +1,19 @@
 import {
-  AffectedRow,
   DeleteOptions,
   FindOneOptions,
   Model,
   Row,
   UpdateOptions,
 } from '../model/model';
+
+export type RowsData<T> = {
+  data: T[];
+  meta: {
+    limit: number;
+    offset: number;
+    count: number;
+  };
+};
 
 export abstract class BaseRepository<T> {
   abstract model: Model<T>;
@@ -16,8 +24,15 @@ export abstract class BaseRepository<T> {
     return (await this.model.create(values, { returnCreated: true })) as Row<T>;
   }
 
-  async findALl(query?: Record<string, any>): Promise<Row<T>[]> {
-    return await this.model.findAll(query);
+  async findALl(query?: Record<string, any>): Promise<RowsData<Row<T>>> {
+    return {
+      data: await this.model.findAll(query),
+      meta: {
+        count: await this.model.count(query),
+        limit: +(query?.limit ?? 10),
+        offset: +(query?.offset ?? 10),
+      },
+    };
   }
 
   async findOne(

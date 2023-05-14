@@ -23,16 +23,27 @@ export function generateFilterTest<T>(method: BaseFilterMethod, mock: Mock<T>) {
 
   describe('base filter test', () => {
     it('should get all limited 2', async () => {
+      const meta = {
+        count: total ?? mock.data.length,
+        limit: 1,
+        offset: 10,
+      };
       const res = await method({
         limit: 1,
         ...query,
       });
 
-      expect(res).to.be.an('array').and.have.length(1);
-      expect(res[0][id]).to.equal(data[0][id]);
+      expect(res.meta).to.eql(meta);
+      expect(res.data).to.be.an('array').and.have.length(1);
+      expect(res.data[0][id]).to.equal(data[0][id]);
     });
 
     it('should get all limited 2 and offseted 1', async () => {
+      const meta = {
+        count: total ?? mock.data.length,
+        limit: 1,
+        offset: 1,
+      };
       const res = await method({
         limit: 1,
         offset: 1,
@@ -40,21 +51,28 @@ export function generateFilterTest<T>(method: BaseFilterMethod, mock: Mock<T>) {
       });
 
       if (expected?.offset) {
-        expect(res).to.be.an('array').and.have.length(1);
-        expect(res[0][id]).to.equal(expected?.offset[id] ?? data[1][id]);
+        expect(res.meta).to.eql(meta);
+        expect(res.data).to.be.an('array').and.have.length(1);
+        expect(res.data[0][id]).to.equal(expected?.offset[id] ?? data[1][id]);
       }
     });
 
     it(`should get all sorted by ${col} desc`, async () => {
+      const meta = {
+        count: total ?? mock.data.length,
+        limit: 10,
+        offset: 10,
+      };
       const res = await method({
         sort: `-${col}`,
         ...query,
       });
 
-      expect(res)
+      expect(res.meta).to.eql(meta);
+      expect(res.data)
         .to.be.an('array')
         .and.have.length(total ?? data.length);
-      expect(res[0][id]).to.equal(
+      expect(res.data[0][id]).to.equal(
         expected?.sort[id] ??
           data.slice(0).sort((a, b) => (a[id] > b[id] ? -1 : 1))[0][id]
       );
@@ -63,6 +81,11 @@ export function generateFilterTest<T>(method: BaseFilterMethod, mock: Mock<T>) {
     // Api
 
     it('should return 200 limited 2', async () => {
+      const meta = {
+        count: total ?? mock.data.length,
+        limit: 1,
+        offset: 10,
+      };
       const res = await supertest(server.httpServer)
         .get(mock.endpoint)
         .query({
@@ -71,11 +94,17 @@ export function generateFilterTest<T>(method: BaseFilterMethod, mock: Mock<T>) {
         })
         .expect(200);
 
-      expect(res.body.data).to.be.an('array').and.have.length(1);
-      expect(res.body.data[0][id]).to.equal(data[0][id]);
+      expect(res.body.data.meta).to.eql(meta);
+      expect(res.body.data.data).to.be.an('array').and.have.length(1);
+      expect(res.body.data.data[0][id]).to.equal(data[0][id]);
     });
 
     it('should return 200 limited 2 and offseted 1', async () => {
+      const meta = {
+        count: total ?? mock.data.length,
+        limit: 1,
+        offset: 1,
+      };
       const res = await supertest(server.httpServer)
         .get(mock.endpoint)
         .query({
@@ -86,14 +115,20 @@ export function generateFilterTest<T>(method: BaseFilterMethod, mock: Mock<T>) {
         .expect(200);
 
       if (expected?.offset) {
-        expect(res.body.data).to.be.an('array').and.have.length(1);
-        expect(res.body.data[0][id]).to.equal(
+        expect(res.body.data.meta).to.eql(meta);
+        expect(res.body.data.data).to.be.an('array').and.have.length(1);
+        expect(res.body.data.data[0][id]).to.equal(
           expected?.offset[id] ?? data[1][id]
         );
       }
     });
 
     it(`should return 200 sorted by ${col} desc`, async () => {
+      const meta = {
+        count: total ?? mock.data.length,
+        limit: 10,
+        offset: 10,
+      };
       const res = await supertest(server.httpServer)
         .get(mock.endpoint)
         .query({
@@ -102,10 +137,11 @@ export function generateFilterTest<T>(method: BaseFilterMethod, mock: Mock<T>) {
         })
         .expect(200);
 
-      expect(res.body.data)
+      expect(res.body.data.meta).to.eql(meta);
+      expect(res.body.data.data)
         .to.be.an('array')
         .and.have.length(total ?? data.length);
-      expect(res.body.data[0][id]).to.equal(
+      expect(res.body.data.data[0][id]).to.equal(
         expected?.sort[id] ??
           data.slice(0).sort((a, b) => (a[id] > b[id] ? -1 : 1))[0][id]
       );

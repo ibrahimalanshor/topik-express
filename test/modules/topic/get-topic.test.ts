@@ -48,9 +48,15 @@ describe('get topic test', () => {
     });
 
     it('should get all topics', async () => {
+      const meta = {
+        count: topics.length,
+        limit: 10,
+        offset: 10,
+      };
       const res = await topicService.findAll();
 
-      expect(res).to.be.an('array').and.have.length(3);
+      expect(res.meta).to.be.an('object').and.eql(meta);
+      expect(res.data).to.be.an('array').and.have.length(topics.length);
     });
 
     generateFilterTest(topicService.findAll.bind(topicService), {
@@ -60,16 +66,29 @@ describe('get topic test', () => {
     });
 
     it('should get all searched topics', async () => {
+      const meta = {
+        count: 1,
+        limit: 10,
+        offset: 10,
+      };
+
       const search = topics[2].name;
       const res = await topicService.findAll({
         name: search,
       });
 
-      expect(res).to.be.an('array').and.have.length(1);
-      expect(res[0].name).to.equal(search);
+      expect(res.meta).to.eql(meta);
+      expect(res.data).to.be.an('array').and.have.length(1);
+      expect(res.data[0].name).to.equal(search);
     });
 
     it('should return 200 searched topics', async () => {
+      const meta = {
+        count: 1,
+        limit: 10,
+        offset: 10,
+      };
+
       const search = topics[2].name;
       const res = await supertest(server.httpServer)
         .get('/api/topics')
@@ -78,8 +97,9 @@ describe('get topic test', () => {
         })
         .expect(200);
 
-      expect(res.body.data).to.be.an('array').and.have.length(1);
-      expect(res.body.data[0].name).to.equal(search);
+      expect(res.body.data.meta).to.eql(meta);
+      expect(res.body.data.data).to.be.an('array').and.have.length(1);
+      expect(res.body.data.data[0].name).to.equal(search);
     });
   });
 });

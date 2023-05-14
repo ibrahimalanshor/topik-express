@@ -14,6 +14,7 @@ import {
 import { StoredTopic } from './topic.entity';
 import { TopicRepository } from './topic.repository';
 import { DeleteTopicParamsDto } from './dto/delete-topic.dto';
+import { RowsData } from '../../common/repository/repository';
 
 @Service()
 export class TopicService {
@@ -25,7 +26,7 @@ export class TopicService {
     return await this.topicRepository.create(values);
   }
 
-  async findAll(query?: Partial<GetTopicDto>): Promise<StoredTopic[]> {
+  async findAll(query?: Partial<GetTopicDto>): Promise<RowsData<StoredTopic>> {
     return await this.topicRepository.findALl(query);
   }
 

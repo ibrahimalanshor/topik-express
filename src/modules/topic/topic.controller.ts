@@ -5,6 +5,7 @@ import { RouterContext } from '../../common/app/response';
 import { EmptyResultError } from '../../common/errors/empty-result-error';
 import { StoredTopic } from './topic.entity';
 import { TopicService } from './topic.service';
+import { RowsData } from '../../common/repository/repository';
 
 @Service()
 export class TopicController {
@@ -18,7 +19,7 @@ export class TopicController {
   }
 
   @autobind
-  async getTopics(context: RouterContext): Promise<StoredTopic[]> {
+  async getTopics(context: RouterContext): Promise<RowsData<StoredTopic>> {
     return await this.topicService.findAll(context.req.query);
   }
 
