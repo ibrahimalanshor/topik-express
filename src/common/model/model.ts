@@ -102,6 +102,14 @@ export abstract class Model<T> extends BaseModel {
     ) as Row<T>[];
   }
 
+  async count(query?: Record<string, any>): Promise<number> {
+    const res = await this.getQueryBuilder()
+      .where(this.getWhereBuilder(query))
+      .count('id as count');
+
+    return res[0].count;
+  }
+
   async findOne(
     where: Record<string, any>,
     options?: FindOneOptions
