@@ -7,6 +7,7 @@ import { ChatService } from './chat.service';
 import { StoredChat } from './chat.entity';
 import { TopicService } from '../topic/topic.service';
 import { BadRequestError } from '../../common/app/http-error/bad-request.error';
+import { RowsData } from '../../common/repository/repository';
 
 @Service()
 export class ChatController {
@@ -34,7 +35,7 @@ export class ChatController {
   }
 
   @autobind
-  async getChats(context: RouterContext): Promise<StoredChat[]> {
+  async getChats(context: RouterContext): Promise<RowsData<StoredChat>> {
     return await this.chatService.findAll(context.req.query);
   }
 

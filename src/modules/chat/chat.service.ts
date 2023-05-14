@@ -14,6 +14,7 @@ import {
   UpdateChatValuesDto,
 } from './dto/update-chat.dto';
 import { DeleteChatParamsDto } from './dto/delete-chat.dto';
+import { RowsData } from '../../common/repository/repository';
 
 @Service()
 export class ChatService {
@@ -23,7 +24,7 @@ export class ChatService {
     return await this.chatRepo.create(values);
   }
 
-  async findAll(query?: Partial<GetChatDto>): Promise<StoredChat[]> {
+  async findAll(query?: Partial<GetChatDto>): Promise<RowsData<StoredChat>> {
     return await this.chatRepo.findALl(query);
   }
 
