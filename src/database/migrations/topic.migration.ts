@@ -6,7 +6,7 @@ export function createTopicMigration(): TableMigration {
     tableName: 'topics',
     columns: (table: Knex.TableBuilder) => {
       table.increments();
-      table.string('name');
+      table.string('name').nullable();
       table.timestamps(true, true);
     },
   };

@@ -13,9 +13,7 @@ export class TopicController {
 
   @autobind
   async createTopic(context: RouterContext): Promise<StoredTopic> {
-    return await this.topicService.create({
-      name: context.req.body.name || 'Untitled',
-    });
+    return await this.topicService.create(context.req.body);
   }
 
   @autobind
