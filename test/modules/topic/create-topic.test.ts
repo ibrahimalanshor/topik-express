@@ -61,7 +61,7 @@ describe('create topic test', () => {
         .and.eql(payload.name);
     });
 
-    it('should return 200 with stored untitled topic', async () => {
+    it('should return 200 with stored empty string topic', async () => {
       const payload = {
         name: '    ',
       };
@@ -74,7 +74,17 @@ describe('create topic test', () => {
       expect(res.body)
         .to.have.property('data')
         .and.have.property('name')
-        .and.eql('Untitled');
+        .and.equal('');
+    });
+
+    it('should return 200 with stored null topic', async () => {
+      const res = await supertest(server.httpServer)
+        .post('/api/topics')
+        .send()
+        .expect(200);
+
+      expect(res.body).to.have.property('data').and.have.property('name').and.be
+        .null;
     });
   });
 });
