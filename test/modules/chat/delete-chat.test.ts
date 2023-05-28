@@ -9,11 +9,25 @@ import { ChatService } from '../../../src/modules/chat/chat.service';
 import { ChatRepository } from '../../../src/modules/chat/chat.repository';
 import { DeleteChatParamsDto } from '../../../src/modules/chat/dto/delete-chat.dto';
 import { StoredChat } from '../../../src/modules/chat/chat.entity';
+import { AuthResult } from '../../../src/modules/auth/auth.entity';
+import { AuthService } from '../../../src/modules/auth/auth.service';
+import { generateAuthTest } from '../../../src/common/test/it/auth.it';
 
 describe('delete chat test', () => {
+  const authService = Container.get(AuthService);
   const chatService = Container.get(ChatService);
   const chatRepo = Container.get(ChatRepository);
   const topicRepo = Container.get(TopicRepository);
+
+  const requestOptions: { token: AuthResult } = {
+    token: '',
+  };
+
+  before(async () => {
+    requestOptions.token = await authService.login({ password: 'password' });
+  });
+
+  generateAuthTest('delete', '/api/chats/id');
 
   describe('invalid param test', () => {
     const invalidParams = {
@@ -28,6 +42,9 @@ describe('delete chat test', () => {
     it('should return 404 param is invalid', async () => {
       await supertest(server.httpServer)
         .delete(`/api/chats/${invalidParams.id}`)
+        .set({
+          authorization: requestOptions.token,
+        })
         .expect(404);
     });
   });
@@ -41,6 +58,9 @@ describe('delete chat test', () => {
     it('should return 404 when param is not found', async () => {
       await supertest(server.httpServer)
         .delete(`/api/chats/${params.id}`)
+        .set({
+          authorization: requestOptions.token,
+        })
         .expect(404);
     });
   });
@@ -71,6 +91,9 @@ describe('delete chat test', () => {
     it('should return 200', async () => {
       await supertest(server.httpServer)
         .delete(`/api/chats/${params.chat?.id}`)
+        .set({
+          authorization: requestOptions.token,
+        })
         .expect(200);
     });
   });

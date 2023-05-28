@@ -9,10 +9,24 @@ import { TopicRepository } from '../../../src/modules/topic/topic.repository';
 import { TopicService } from '../../../src/modules/topic/topic.service';
 import { CreateTopicDto } from '../../../src/modules/topic/dto/create-topic.dto';
 import { generateFilterTest } from '../../../src/common/test/it/filter.it';
+import { AuthResult } from '../../../src/modules/auth/auth.entity';
+import { AuthService } from '../../../src/modules/auth/auth.service';
+import { generateAuthTest } from '../../../src/common/test/it/auth.it';
 
 describe('get topic test', () => {
   const topicRepo = Container.get(TopicRepository);
   const topicService = Container.get(TopicService);
+  const authService = Container.get(AuthService);
+
+  const requestOptions: { token: AuthResult } = {
+    token: '',
+  };
+
+  before(async () => {
+    requestOptions.token = await authService.login({ password: 'password' });
+  });
+
+  generateAuthTest('get', '/api/topics');
 
   describe('validation test', () => {
     const invalidPayload = {
@@ -29,6 +43,9 @@ describe('get topic test', () => {
     it('should return 400 when query request is invalid', async () => {
       const res = await supertest(server.httpServer)
         .get('/api/topics')
+        .set({
+          authorization: requestOptions.token,
+        })
         .query(invalidPayload)
         .expect(400);
 
@@ -45,6 +62,13 @@ describe('get topic test', () => {
     before(async () => {
       await topicRepo.delete();
       await topicService.create(topics);
+
+      generateFilterTest(topicService.findAll.bind(topicService), {
+        data: topics,
+        id: 'name',
+        endpoint: '/api/topics',
+        token: requestOptions.token,
+      });
     });
 
     it('should get all topics', async () => {
@@ -57,12 +81,6 @@ describe('get topic test', () => {
 
       expect(res.meta).to.be.an('object').and.eql(meta);
       expect(res.data).to.be.an('array').and.have.length(topics.length);
-    });
-
-    generateFilterTest(topicService.findAll.bind(topicService), {
-      data: topics,
-      id: 'name',
-      endpoint: '/api/topics',
     });
 
     it('should get all searched topics', async () => {
@@ -92,6 +110,9 @@ describe('get topic test', () => {
       const search = topics[2].name;
       const res = await supertest(server.httpServer)
         .get('/api/topics')
+        .set({
+          authorization: requestOptions.token,
+        })
         .query({
           name: search,
         })

@@ -15,10 +15,11 @@ type Mock<T> = {
     offset: T | null;
     sort: T;
   };
+  token?: string;
 };
 
 export function generateFilterTest<T>(method: BaseFilterMethod, mock: Mock<T>) {
-  const { data, id, query, expected, total } = mock;
+  const { data, id, query, expected, total, token } = mock;
   const col = id.toString();
 
   describe('base filter test', () => {
@@ -88,6 +89,9 @@ export function generateFilterTest<T>(method: BaseFilterMethod, mock: Mock<T>) {
       };
       const res = await supertest(server.httpServer)
         .get(mock.endpoint)
+        .set({
+          authorization: token,
+        })
         .query({
           limit: 1,
           ...query,
@@ -107,6 +111,9 @@ export function generateFilterTest<T>(method: BaseFilterMethod, mock: Mock<T>) {
       };
       const res = await supertest(server.httpServer)
         .get(mock.endpoint)
+        .set({
+          authorization: token,
+        })
         .query({
           limit: 1,
           offset: 1,
@@ -131,6 +138,9 @@ export function generateFilterTest<T>(method: BaseFilterMethod, mock: Mock<T>) {
       };
       const res = await supertest(server.httpServer)
         .get(mock.endpoint)
+        .set({
+          authorization: token,
+        })
         .query({
           sort: `-${col}`,
           ...query,

@@ -9,11 +9,25 @@ import { ChatService } from '../../../src/modules/chat/chat.service';
 import { ChatRepository } from '../../../src/modules/chat/chat.repository';
 import { UpdateChatValuesDto } from '../../../src/modules/chat/dto/update-chat.dto';
 import { StoredChat } from '../../../src/modules/chat/chat.entity';
+import { AuthResult } from '../../../src/modules/auth/auth.entity';
+import { AuthService } from '../../../src/modules/auth/auth.service';
+import { generateAuthTest } from '../../../src/common/test/it/auth.it';
 
 describe('update chat test', () => {
   const chatService = Container.get(ChatService);
   const chatRepo = Container.get(ChatRepository);
   const topicRepo = Container.get(TopicRepository);
+  const authService = Container.get(AuthService);
+
+  const requestOptions: { token: AuthResult } = {
+    token: '',
+  };
+
+  before(async () => {
+    requestOptions.token = await authService.login({ password: 'password' });
+  });
+
+  generateAuthTest('patch', '/api/chats/id');
 
   describe('validation test', () => {
     it('should return validation error when object is invalid', async () => {
@@ -29,6 +43,9 @@ describe('update chat test', () => {
     it('should return 422 when body is invalid', async () => {
       const res = await supertest(server.httpServer)
         .patch(`/api/chats/1`)
+        .set({
+          authorization: requestOptions.token,
+        })
         .send({
           content: '    ',
         })
@@ -53,6 +70,9 @@ describe('update chat test', () => {
     it('should 404 when params id is invalid', async () => {
       await supertest(server.httpServer)
         .patch(`/api/chats/invalid`)
+        .set({
+          authorization: requestOptions.token,
+        })
         .send({
           content: 'content',
         })
@@ -68,6 +88,9 @@ describe('update chat test', () => {
     it('should return 404 when id is not exists', async () => {
       await supertest(server.httpServer)
         .patch('/api/chats/999')
+        .set({
+          authorization: requestOptions.token,
+        })
         .send({ content: 'test' })
         .expect(404);
     });
@@ -100,6 +123,9 @@ describe('update chat test', () => {
     it('should 200 updated test', async () => {
       const res = await supertest(server.httpServer)
         .patch(`/api/chats/${test.chat?.id}`)
+        .set({
+          authorization: requestOptions.token,
+        })
         .send(payload)
         .expect(200);
 

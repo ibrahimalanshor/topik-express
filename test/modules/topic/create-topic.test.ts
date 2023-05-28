@@ -7,10 +7,24 @@ import { server } from '../../../server';
 import { TopicService } from '../../../src/modules/topic/topic.service';
 import Container from 'typedi';
 import { TopicRepository } from '../../../src/modules/topic/topic.repository';
+import { AuthResult } from '../../../src/modules/auth/auth.entity';
+import { AuthService } from '../../../src/modules/auth/auth.service';
+import { generateAuthTest } from '../../../src/common/test/it/auth.it';
 
 describe('create topic test', () => {
   const topicService = Container.get(TopicService);
   const topicRepo = Container.get(TopicRepository);
+  const authService = Container.get(AuthService);
+
+  const requestOptions: { token: AuthResult } = {
+    token: '',
+  };
+
+  before(async () => {
+    requestOptions.token = await authService.login({ password: 'password' });
+  });
+
+  generateAuthTest('post', '/api/topics');
 
   describe('validation test', () => {
     const invalidPayload = {
@@ -27,6 +41,9 @@ describe('create topic test', () => {
     it('it should return 422 when body request is invalid', async () => {
       const res = await supertest(server.httpServer)
         .post('/api/topics')
+        .set({
+          authorization: requestOptions.token,
+        })
         .send(invalidPayload)
         .expect(422);
 
@@ -52,6 +69,9 @@ describe('create topic test', () => {
     it('should return 200 with stored topic', async () => {
       const res = await supertest(server.httpServer)
         .post('/api/topics')
+        .set({
+          authorization: requestOptions.token,
+        })
         .send(payload)
         .expect(200);
 
@@ -68,6 +88,9 @@ describe('create topic test', () => {
 
       const res = await supertest(server.httpServer)
         .post('/api/topics')
+        .set({
+          authorization: requestOptions.token,
+        })
         .send(payload)
         .expect(200);
 
@@ -80,6 +103,9 @@ describe('create topic test', () => {
     it('should return 200 with stored null topic', async () => {
       const res = await supertest(server.httpServer)
         .post('/api/topics')
+        .set({
+          authorization: requestOptions.token,
+        })
         .send()
         .expect(200);
 

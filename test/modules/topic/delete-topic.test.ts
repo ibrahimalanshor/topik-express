@@ -8,10 +8,24 @@ import Container from 'typedi';
 import { TopicService } from '../../../src/modules/topic/topic.service';
 import { TopicRepository } from '../../../src/modules/topic/topic.repository';
 import { StoredTopic } from '../../../src/modules/topic/topic.entity';
+import { AuthResult } from '../../../src/modules/auth/auth.entity';
+import { AuthService } from '../../../src/modules/auth/auth.service';
+import { generateAuthTest } from '../../../src/common/test/it/auth.it';
 
 describe('delete topic test', () => {
   const topicService = Container.get(TopicService);
   const topicRepo = Container.get(TopicRepository);
+  const authService = Container.get(AuthService);
+
+  const requestOptions: { token: AuthResult } = {
+    token: '',
+  };
+
+  before(async () => {
+    requestOptions.token = await authService.login({ password: 'password' });
+  });
+
+  generateAuthTest('delete', '/api/topics/id');
 
   describe('invalid param test', () => {
     const invalidParams = {
@@ -26,6 +40,9 @@ describe('delete topic test', () => {
     it('should return 404 param is invalid', async () => {
       await supertest(server.httpServer)
         .delete(`/api/topics/${invalidParams.id}`)
+        .set({
+          authorization: requestOptions.token,
+        })
         .expect(404);
     });
   });
@@ -39,6 +56,9 @@ describe('delete topic test', () => {
     it('should return 404 when param is not found', async () => {
       await supertest(server.httpServer)
         .delete(`/api/topics/${params.id}`)
+        .set({
+          authorization: requestOptions.token,
+        })
         .expect(404);
     });
   });
@@ -65,6 +85,9 @@ describe('delete topic test', () => {
     it('should return 200', async () => {
       await supertest(server.httpServer)
         .delete(`/api/topics/${params.topic?.id}`)
+        .set({
+          authorization: requestOptions.token,
+        })
         .expect(200);
     });
   });

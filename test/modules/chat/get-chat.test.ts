@@ -12,12 +12,26 @@ import { CreateChatDto } from '../../../src/modules/chat/dto/create-chat.dto';
 import { StoredTopic } from '../../../src/modules/topic/topic.entity';
 import { TopicService } from '../../../src/modules/topic/topic.service';
 import { TopicRepository } from '../../../src/modules/topic/topic.repository';
+import { AuthResult } from '../../../src/modules/auth/auth.entity';
+import { AuthService } from '../../../src/modules/auth/auth.service';
+import { generateAuthTest } from '../../../src/common/test/it/auth.it';
 
 describe('get chat test', () => {
   const chatRepo = Container.get(ChatRepository);
   const chatService = Container.get(ChatService);
   const topicService = Container.get(TopicService);
   const topicRepo = Container.get(TopicRepository);
+  const authService = Container.get(AuthService);
+
+  const requestOptions: { token: AuthResult } = {
+    token: '',
+  };
+
+  before(async () => {
+    requestOptions.token = await authService.login({ password: 'password' });
+  });
+
+  generateAuthTest('get', '/api/chats');
 
   describe('validation test', () => {
     const invalidPayload = {
@@ -33,6 +47,9 @@ describe('get chat test', () => {
     it('should return 400 when query request is invalid', async () => {
       const res = await supertest(server.httpServer)
         .get('/api/chats')
+        .set({
+          authorization: requestOptions.token,
+        })
         .query(invalidPayload)
         .expect(400);
 
@@ -82,6 +99,7 @@ describe('get chat test', () => {
           offset: null,
           sort: test.chats[0],
         },
+        token: requestOptions.token,
       });
     });
 
@@ -128,6 +146,9 @@ describe('get chat test', () => {
         .get('/api/chats')
         .query({
           topic_id: topicId,
+        })
+        .set({
+          authorization: requestOptions.token,
         })
         .expect(200);
 

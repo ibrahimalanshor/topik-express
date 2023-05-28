@@ -11,10 +11,24 @@ import Container from 'typedi';
 import { TopicService } from '../../../src/modules/topic/topic.service';
 import { StoredTopic } from '../../../src/modules/topic/topic.entity';
 import { TopicRepository } from '../../../src/modules/topic/topic.repository';
+import { AuthResult } from '../../../src/modules/auth/auth.entity';
+import { AuthService } from '../../../src/modules/auth/auth.service';
+import { generateAuthTest } from '../../../src/common/test/it/auth.it';
 
 describe('update topic test', () => {
   const topicService = Container.get(TopicService);
   const topicRepo = Container.get(TopicRepository);
+  const authService = Container.get(AuthService);
+
+  const requestOptions: { token: AuthResult } = {
+    token: '',
+  };
+
+  before(async () => {
+    requestOptions.token = await authService.login({ password: 'password' });
+  });
+
+  generateAuthTest('patch', '/api/topics/id');
 
   describe('validation test', () => {
     it('should return validation error when object is invalid', async () => {
@@ -30,6 +44,9 @@ describe('update topic test', () => {
     it('should return 422 when body is invalid', async () => {
       const res = await supertest(server.httpServer)
         .patch(`/api/topics/1`)
+        .set({
+          authorization: requestOptions.token,
+        })
         .send({
           name: '    ',
         })
@@ -54,6 +71,9 @@ describe('update topic test', () => {
     it('should 404 when params id is invalid', async () => {
       await supertest(server.httpServer)
         .patch(`/api/topics/invalid`)
+        .set({
+          authorization: requestOptions.token,
+        })
         .send({
           name: 'name',
         })
@@ -69,6 +89,9 @@ describe('update topic test', () => {
     it('should return 404 when id is not exists', async () => {
       await supertest(server.httpServer)
         .patch('/api/topics/999')
+        .set({
+          authorization: requestOptions.token,
+        })
         .send({ name: 'test' })
         .expect(404);
     });
@@ -97,6 +120,9 @@ describe('update topic test', () => {
     it('should 200 updated test', async () => {
       const res = await supertest(server.httpServer)
         .patch(`/api/topics/${test.topic?.id}`)
+        .set({
+          authorization: requestOptions.token,
+        })
         .send(payload)
         .expect(200);
 

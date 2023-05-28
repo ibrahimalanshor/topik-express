@@ -18,16 +18,19 @@ import {
   UpdateChatValuesDto,
 } from './dto/update-chat.dto';
 import { DeleteChatParamsDto } from './dto/delete-chat.dto';
+import { createAuthMiddleware } from '../../common/app/middlewares/auth.middleware';
 
 export const chatRoute = createRoute<ChatController>(
   Container.get(ChatController)
 )
   .post('/api/chats', (controller: ChatController) => [
+    createAuthMiddleware(),
     createTrimBodyMiddleware(),
     createBodyValidator(CreateChatDto),
     createJsonResponse(controller.createChat),
   ])
   .get('/api/chats', (controller: ChatController) => [
+    createAuthMiddleware(),
     createQueryValidator(GetChatDto, {
       pre: (query) => ({
         topic_id: toNumber(query.topic_id),
@@ -37,6 +40,7 @@ export const chatRoute = createRoute<ChatController>(
     createJsonResponse(controller.getChats),
   ])
   .get('/api/chats/:id', (controller: ChatController) => [
+    createAuthMiddleware(),
     createParamsValidator(FindChatParamsDto, {
       pre: (param) => ({
         id: toNumber(param.id),
@@ -45,6 +49,7 @@ export const chatRoute = createRoute<ChatController>(
     createJsonResponse(controller.findChat),
   ])
   .patch('/api/chats/:id', (controller: ChatController) => [
+    createAuthMiddleware(),
     createParamsValidator(UpdateChatParamsDto, {
       pre: (param) => ({
         id: toNumber(param.id),
@@ -55,6 +60,7 @@ export const chatRoute = createRoute<ChatController>(
     createJsonResponse(controller.updateChat),
   ])
   .delete('/api/chats/:id', (controller: ChatController) => [
+    createAuthMiddleware(),
     createParamsValidator(DeleteChatParamsDto, {
       pre: (param) => ({
         id: toNumber(param.id),
