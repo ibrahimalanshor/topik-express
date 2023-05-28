@@ -1,4 +1,1 @@
-export interface AuthResult {
-  accessToken: String;
-  refreshToken: String;
-}
+export type AuthResult = string;

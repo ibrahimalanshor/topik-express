@@ -16,17 +16,10 @@ export class AuthService {
       );
     }
 
-    return {
-      accessToken: await generateToken(
-        authConfig.key,
-        { type: 'access-token' },
-        { expire: '15m' }
-      ),
-      refreshToken: await generateToken(
-        authConfig.key,
-        { type: 'refresh-token' },
-        { expire: '30d' }
-      ),
-    };
+    return await generateToken(
+      authConfig.key,
+      { type: 'access-token' },
+      { expire: '15m' }
+    );
   }
 }

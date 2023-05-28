@@ -7,7 +7,7 @@ import { server } from '../../../server';
 import Container from 'typedi';
 import { AuthService } from '../../../src/modules/auth/auth.service';
 
-describe.only('login test', () => {
+describe('login test', () => {
   const authService = Container.get(AuthService);
 
   describe('validation test', () => {
@@ -59,9 +59,7 @@ describe.only('login test', () => {
     it('should return auth result', async () => {
       const res = await authService.login(credential);
 
-      expect(res).to.be.an('object');
-      expect(res).to.have.property('accessToken');
-      expect(res).to.have.property('refreshToken');
+      expect(res).to.be.an('string');
     });
     it('should return 200 and auth result', async () => {
       const res = await supertest(server.httpServer)
@@ -69,9 +67,7 @@ describe.only('login test', () => {
         .send(credential)
         .expect(200);
 
-      expect(res.body.data).to.be.an('object');
-      expect(res.body.data).to.have.property('accessToken');
-      expect(res.body.data).to.have.property('refreshToken');
+      expect(res.body.data).to.be.an('string');
     });
   });
 });
