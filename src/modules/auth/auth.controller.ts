@@ -16,7 +16,7 @@ export class AuthController {
       return await this.authService.login(context.req.body);
     } catch (err) {
       if (err instanceof AuthenticationError) {
-        throw new UnauthorizedError(err.message);
+        throw new UnauthorizedError({}, err.message);
       }
 
       throw err;
