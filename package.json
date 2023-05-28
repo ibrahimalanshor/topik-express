@@ -1,0 +1,71 @@
+{
+  "name": "topik-express",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha",
+    "dev": "nodemon bin/serve.ts",
+    "build": "rimraf dist && tsc --build && copyfiles .env.* dist",
+    "start": "node dist/bin/serve.js",
+    "prepare": "husky install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ibrahimalanshor/topik-express.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ibrahimalanshor/topik-express/issues"
+  },
+  "homepage": "https://github.com/ibrahimalanshor/topik-express#readme",
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
+    "@types/chai": "^4.3.5",
+    "@types/chai-as-promised": "^7.1.5",
+    "@types/cors": "^2.8.13",
+    "@types/express": "^4.17.17",
+    "@types/helmet": "^4.0.0",
+    "@types/jsonwebtoken": "^9.0.2",
+    "@types/mocha": "^10.0.1",
+    "@types/morgan": "^1.9.4",
+    "@types/supertest": "^2.0.12",
+    "@typescript-eslint/eslint-plugin": "^5.59.2",
+    "@typescript-eslint/parser": "^5.59.2",
+    "chai": "^4.3.7",
+    "chai-as-promised": "^7.1.1",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.0",
+    "copyfiles": "^2.4.1",
+    "dotenv": "^16.0.3",
+    "eslint": "^8.39.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.2",
+    "mocha": "^10.2.0",
+    "nodemon": "^2.0.22",
+    "prettier": "2.8.8",
+    "rimraf": "^5.0.0",
+    "supertest": "^6.3.3",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.4"
+  },
+  "lint-staged": {
+    "*.{ts,js}": "eslint --cache --fix",
+    "*.{ts,js,css,md}": "prettier --write"
+  },
+  "dependencies": {
+    "autobind-decorator": "^2.4.0",
+    "bcrypt": "^5.1.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "helmet": "^7.0.0",
+    "jsonwebtoken": "^9.0.0",
+    "knex": "^2.4.2",
+    "morgan": "^1.10.0",
+    "mysql2": "^3.3.0",
+    "reflect-metadata": "^0.1.13",
+    "typedi": "^0.10.0"
+  }
+}
