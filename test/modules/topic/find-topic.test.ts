@@ -6,12 +6,25 @@ import { server } from '../../../server';
 import { StoredTopic } from '../../../src/modules/topic/topic.entity';
 import { TopicRepository } from '../../../src/modules/topic/topic.repository';
 import { TopicService } from '../../../src/modules/topic/topic.service';
+import { AuthResult } from '../../../src/modules/auth/auth.entity';
+import { AuthService } from '../../../src/modules/auth/auth.service';
+import { generateAuthTest } from '../../../src/common/test/it/auth.it';
 
 describe('find topic test', () => {
   const topicService = Container.get(TopicService);
   const topicRepo = Container.get(TopicRepository);
+  const authService = Container.get(AuthService);
 
+  const requestOptions: { token: AuthResult } = {
+    token: '',
+  };
   const test: { topic?: StoredTopic } = {};
+
+  before(async () => {
+    requestOptions.token = await authService.login({ password: 'password' });
+  });
+
+  generateAuthTest('get', '/api/topics/id');
 
   before(async () => {
     await topicRepo.delete();
@@ -30,11 +43,21 @@ describe('find topic test', () => {
   });
 
   it('should return 404 error when id is invalid', async () => {
-    await supertest(server.httpServer).get(`/api/topics/invalid`).expect(404);
+    await supertest(server.httpServer)
+      .get(`/api/topics/invalid`)
+      .set({
+        authorization: requestOptions.token,
+      })
+      .expect(404);
   });
 
   it('should return 404 error when id is not found', async () => {
-    await supertest(server.httpServer).get(`/api/topics/999`).expect(404);
+    await supertest(server.httpServer)
+      .get(`/api/topics/999`)
+      .set({
+        authorization: requestOptions.token,
+      })
+      .expect(404);
   });
 
   it('should return single topic by id', async () => {
@@ -48,6 +71,9 @@ describe('find topic test', () => {
   it('should return 200 with single topic', async () => {
     const res = await supertest(server.httpServer)
       .get(`/api/topics/${test.topic?.id}`)
+      .set({
+        authorization: requestOptions.token,
+      })
       .expect(200);
 
     expect(res.body.data.id).to.eql(test.topic?.id);

@@ -18,21 +18,25 @@ import {
   UpdateTopicValuesDto,
 } from './dto/update-topic.dto';
 import { DeleteTopicParamsDto } from './dto/delete-topic.dto';
+import { createAuthMiddleware } from '../../common/app/middlewares/auth.middleware';
 
 export const topicRoute = createRoute<TopicController>(
   Container.get(TopicController)
 )
   .post('/api/topics', (controller: TopicController) => [
+    createAuthMiddleware(),
     createTrimBodyMiddleware(),
     createBodyValidator(CreateTopicDto),
     createJsonResponse(controller.createTopic),
   ])
   .get('/api/topics', (controller: TopicController) => [
+    createAuthMiddleware(),
     createQueryValidator(GetTopicDto),
     createRemoveUndefinedValuesMiddleware(),
     createJsonResponse(controller.getTopics),
   ])
   .get('/api/topics/:id', (controller: TopicController) => [
+    createAuthMiddleware(),
     createParamsValidator(FindTopicParamsDto, {
       pre: (param) => ({
         id: toNumber(param.id),
@@ -41,6 +45,7 @@ export const topicRoute = createRoute<TopicController>(
     createJsonResponse(controller.findTopic),
   ])
   .patch('/api/topics/:id', (controller: TopicController) => [
+    createAuthMiddleware(),
     createParamsValidator(UpdateTopicParamsDto, {
       pre: (param) => ({
         id: toNumber(param.id),
@@ -51,6 +56,7 @@ export const topicRoute = createRoute<TopicController>(
     createJsonResponse(controller.updateTopic),
   ])
   .delete('/api/topics/:id', (controller: TopicController) => [
+    createAuthMiddleware(),
     createParamsValidator(DeleteTopicParamsDto, {
       pre: (param) => ({
         id: toNumber(param.id),

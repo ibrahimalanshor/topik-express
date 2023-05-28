@@ -1,0 +1,8 @@
+{
+    "auth": {
+        "error": {
+            "incorrect-credential": "Credential Incorrect",
+            "authorization-token-required": "Authorization Token Required"
+        }
+    }
+}

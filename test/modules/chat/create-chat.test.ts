@@ -10,12 +10,26 @@ import { CreateChatDto } from '../../../src/modules/chat/dto/create-chat.dto';
 import { TopicService } from '../../../src/modules/topic/topic.service';
 import { RowId } from '../../../src/common/model/model';
 import { TopicRepository } from '../../../src/modules/topic/topic.repository';
+import { generateAuthTest } from '../../../src/common/test/it/auth.it';
+import { AuthResult } from '../../../src/modules/auth/auth.entity';
+import { AuthService } from '../../../src/modules/auth/auth.service';
 
 describe('create chat test', () => {
+  const authService = Container.get(AuthService);
   const chatService = Container.get(ChatService);
   const topicService = Container.get(TopicService);
   const chatRepo = Container.get(ChatRepository);
   const topicRepo = Container.get(TopicRepository);
+
+  const requestOptions: { token: AuthResult } = {
+    token: '',
+  };
+
+  before(async () => {
+    requestOptions.token = await authService.login({ password: 'password' });
+  });
+
+  generateAuthTest('post', '/api/chats');
 
   describe('validation test', () => {
     const invalidPayload = {
@@ -33,6 +47,9 @@ describe('create chat test', () => {
     it('it should return 422 when body request is invalid', async () => {
       const res = await supertest(server.httpServer)
         .post('/api/chats')
+        .set({
+          authorization: requestOptions.token,
+        })
         .send(invalidPayload)
         .expect(422);
 
@@ -45,6 +62,9 @@ describe('create chat test', () => {
     it('should return 400 when topic id is not found', async () => {
       await supertest(server.httpServer)
         .post('/api/chats')
+        .set({
+          authorization: requestOptions.token,
+        })
         .send({
           content: 'Hello World',
           topic_id: 999,
@@ -76,6 +96,9 @@ describe('create chat test', () => {
     it('should return 200 with stored topic', async () => {
       const res = await supertest(server.httpServer)
         .post('/api/chats')
+        .set({
+          authorization: requestOptions.token,
+        })
         .send(payload)
         .expect(200);
 
